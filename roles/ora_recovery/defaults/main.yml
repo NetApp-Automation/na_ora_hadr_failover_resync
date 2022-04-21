@@ -1,0 +1,5 @@
+---
+# Default oracle parameters
+oracle_user: rdsdb
+oracle_install_group: rdsdb
+script_dir: /tmp

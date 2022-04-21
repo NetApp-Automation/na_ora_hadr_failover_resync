@@ -1,0 +1,69 @@
+- block:
+#    - name: ONTAP Info
+#      netapp.ontap.na_ontap_info:
+#        hostname: "{{ src_cluster_ip }}"
+#        username: "{{ src_cluster_username }}"
+#        password: "{{ src_cluster_password }}"
+#        http_port: null
+#        https: true
+#        validate_certs: false
+#        gather_subset: "clock_info"
+#      register: ontap_time
+#      tags:
+#        - ontap_time
+    - name: Get Timestamp
+      uri:
+        url: https://{{ src_cluster_ip }}/api/cluster
+        user: "{{ src_cluster_username }}"
+        password: "{{ src_cluster_password }}"
+        method: GET
+        validate_certs: false
+      register: ontap_time
+
+    - set_fact:
+        readable_format: "{{ ontap_time.json.statistics.timestamp }}"
+
+
+#    - set_fact:
+#        temp: "{{ ontap_time.ontap_info.clock_info.local_time }}"
+
+#    - set_fact:
+#        readable_format: "{{ '%Y-%m-%d:%H:%M:00' | strftime(temp) }}"
+
+    - name: Archive Logs Snapshot
+      netapp.ontap.na_ontap_cg_snapshot:
+        hostname: "{{ src_cluster_ip }}"
+        username: "{{ src_cluster_username }}"
+        password: "{{ src_cluster_password }}"
+        state: present
+        https: true
+        validate_certs: false
+        use_rest: always
+        vserver: "{{ src_vserver }}"
+        snapshot: "{{ cg_snapshot_name_prefix + '.' + readable_format }}"
+        volumes: "{{ src_archivelog_vols }}"
+        snapmirror_label: "{{ cg_snapshot_name_prefix }}"
+      tags:
+        - ontap_logs_snapshot
+
+    - name: Snapmirror Update for Oracle Archive Logs
+      netapp.ontap.na_ontap_ssh_command:
+        hostname: "{{ dst_cluster_ip }}"
+        username: "{{ dst_cluster_username }}"
+        password: "{{ dst_cluster_password }}"
+        command: "snapmirror update -destination-path {{ dst_vserver + ':' + 'dr_' + item }} -source-snapshot {{ cg_snapshot_name_prefix + '.' + readable_format }}"
+        accept_unknown_host_keys: true
+        privilege: admin
+      with_items:
+       - "{{ src_archivelog_vols }}"
+      tags:
+        - ontap_logs_snapmirror_update
+
+  rescue:
+    - name: Failure
+      fail:
+        msg:
+        - Create destination volume for SnapMirror failed with error - "{{ oracle_replication.stderr }}"
+        - Possible troubleshooting steps:
+        - 1. Check if ONTAP API is reachable
+        - 2. Check if variables defined adhere to the guidelines      

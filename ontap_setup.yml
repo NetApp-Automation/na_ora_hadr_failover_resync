@@ -1,0 +1,13 @@
+#This playbook will execute the tasks for setting up intercluster communications and initializing the Oracle DB volumes snapmirror
+- name: ONTAP Intercluster Setup and Configuration 
+  collections:
+    - netapp.ontap
+  hosts: localhost
+  connection: local
+  gather_facts: False
+  vars_files:
+    - roles/ontap_setup/defaults/main.yml    
+  roles:
+    - role: ontap_setup
+  tags:
+    -  ontap_setup  

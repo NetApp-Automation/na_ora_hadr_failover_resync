@@ -1,0 +1,69 @@
+##################################################################
+##################################################################
+- block:
+    - name: Create Snapmiror Policy
+      na_ontap_snapmirror_policy:
+        hostname: "{{ dst_cluster_ip }}"
+        username: "{{ dst_cluster_username }}"
+        password: "{{ dst_cluster_password }}"
+        state: present
+        vserver: "{{ dst_vserver }}"
+        policy_name: "{{ snapmirror_policy }}"
+        policy_type: async_mirror
+        comment: "Created by Ansible"
+        https: true
+        validate_certs: false
+
+    - name: Obtain Oracle Consistency Group Volumes
+      set_fact:
+        src_cg_vols: "{{ src_db_vols + src_archivelog_vols }}"
+    - debug:
+        msg: "Source Consistency Group Volumes {{ src_cg_vols }}"
+
+    - name: Create ONTAP/ONTAP SnapMirror
+      na_ontap_snapmirror:
+        hostname: "{{ dst_cluster_ip }}"
+        username: "{{ dst_cluster_username }}"
+        password: "{{ dst_cluster_password }}"
+        state: present
+        source_endpoint:
+          cluster: "{{ src_cluster_name }}"
+          path: "{{ src_vserver + ':' + item }}"
+        destination_endpoint:
+          cluster: "{{ dst_cluster_name }}"
+          path: "{{ dst_vserver + ':' + 'dr_' + item }}"
+        initialize: true
+        create_destination:
+          enabled: true
+        policy: "{{ snapmirror_policy }}"
+        relationship_type: extended_data_protection
+        https: true
+        validate_certs: false
+        use_rest: always
+      register: snapmirror_create
+      with_items:
+        - "{{ src_cg_vols }}"
+      async: 600
+      poll: 0
+
+    - name: Wait for Snapmirrors to complete
+      async_status:
+        jid: "{{ item.ansible_job_id }}"
+      register: snapmirror_jobs
+      until: snapmirror_jobs.finished
+      delay: 5  
+      retries: 100
+      with_items: "{{ snapmirror_create.results }}"
+
+  tags:
+    - ontap_snapmirror_create
+    - ontap_snapmirror_policy
+    - ontap_snapmirror  
+  rescue:
+    - name: Failure
+      fail:
+        msg:
+        - Create destination volume for SnapMirror failed with error
+        - Possible troubleshooting steps:
+        - 1. Check if ONTAP API is reachable
+        - 2. Check if variables defined adhere to the guidelines

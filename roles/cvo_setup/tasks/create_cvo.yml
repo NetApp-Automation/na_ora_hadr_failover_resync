@@ -1,0 +1,57 @@
+---
+###########   Create CVO Instace in AWS  #############
+#- name: Create NetApp Cloud Manager CVO for AWS single
+#  netapp.cloudmanager.na_cloudmanager_cvo_aws:
+#    state: present
+#    refresh_token: "{{ token }}"
+#    name: "{{ cvo_name }}"
+#    region: "{{ region_deploy }}"
+#    subnet_id: "{{ subnet }}"
+#    vpc_id: "{{ vpc }}"
+#    svm_password: "{{ cvo_svm_password }}"
+#    client_id: "{{ connector.msg.client_id }}"
+#    writing_speed_state: NORMAL
+#    is_ha: false
+#    associate_public_ip_address: false
+#  tags:
+#    - aws_cvo_single
+
+################# Create HA Instance #########################
+
+- name: Create NetApp Cloud Manager CVO for AWS HA
+  netapp.cloudmanager.na_cloudmanager_cvo_aws:
+    state: present
+    refresh_token: "{{ token }}"
+    name: "{{ cvo_name }}"
+    region: "{{ region_deploy }}"
+    subnet_id: "{{ subnet }}"
+    vpc_id: "{{ vpc }}"
+    svm_password: "{{ cvo_svm_password }}"
+    client_id: "{{ connector.msg.client_id }}"
+    writing_speed_state: NORMAL
+    aws_tag: [
+        {tag_key: netapp1,
+        tag_value: net123}]
+    is_ha: true
+    mediator_assign_public_ip: false
+    node1_subnet_id: "{{ subnet }}"
+    node2_subnet_id: "{{ subnet }}"
+    mediator_subnet_id: "{{ subnet }}"
+    license_type: ha-cot-explore-paygo
+    instance_type: m5.xlarge
+    instance_profile_name: "{{ aws_role_name }}"
+    security_group_id: "{{ security_group }}"
+#    cluster_floating_ip: 172.30.0.124
+#    data_floating_ip: 172.30.0.125
+#    data_floating_ip2: 172.30.0.126
+#    route_table_ids: rtb-075d2e62
+    failover_mode: PrivateIP
+    mediator_key_pair_name: sufi-key-virginia
+
+    
+########################################################
+
+- name: Pause for 2 minutes to Create CVO
+  pause:
+    minutes: 2
+

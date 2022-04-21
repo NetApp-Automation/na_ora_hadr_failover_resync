@@ -1,0 +1,14 @@
+---
+#Please Enter Source Volume Name to be protected
+src_cg_vols: []
+
+#Credentials
+src_cluster_username: fsxadmin
+src_cluster_password: netapp1!
+dst_cluster_username: fsxadmin
+dst_cluster_password: netapp1!
+
+src_snapadmin_username: vsadmin
+src_snapadmin_password: netapp1!
+dst_snapadmin_username: vsadmin
+dst_snapadmin_password: netapp1!
