@@ -1,14 +1,20 @@
 ---
+#CA_signed_certificates (ONLY CHANGE to 'true' IF YOU ARE USING CA SIGNED CERTIFICATES)
+ca_signed_certs: false
+default_snapshot_policy:
+  - default
+  - default-1weekly
+
 #Please Enter Source Volume Name to be protected
 src_cg_vols: []
 
 #Credentials
 src_cluster_username: fsxadmin
-src_cluster_password: netapp1!
+src_cluster_password: NetApp!23
 dst_cluster_username: fsxadmin
-dst_cluster_password: netapp1!
+dst_cluster_password: NetApp!23
 
 src_snapadmin_username: vsadmin
-src_snapadmin_password: netapp1!
+src_snapadmin_password: NetApp!23
 dst_snapadmin_username: vsadmin
-dst_snapadmin_password: netapp1!
+dst_snapadmin_password: NetApp!23

@@ -5,4 +5,4 @@ collections:
   - community.aws
 
   - name: netapp.ontap
-    version: 21.10.0
+    version: 21.19.1

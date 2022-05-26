@@ -1,0 +1,43 @@
+- block:
+    - name: Obtain Oracle Consistency Group Volumes
+      set_fact:
+        src_cg_vols: "{{ src_db_vols + src_archivelog_vols }}"
+    - debug:
+        msg: "Source Consistency Group Volumes {{ src_cg_vols }}"
+
+    - name: Break ONTAP/ONTAP SnapMirror
+      netapp.ontap.na_ontap_snapmirror:
+        hostname: "{{ dst_cluster_ip }}"
+        username: "{{ dst_cluster_username }}"
+        password: "{{ dst_cluster_password }}"
+        state: present
+        relationship_state: broken
+        source_endpoint:
+          cluster: "{{ src_cluster_name }}"
+          path: "{{ src_vserver + ':' + item }}"
+        destination_endpoint:
+          cluster: "{{ dst_cluster_name }}"
+          path: "{{ dst_vserver + ':' + 'dr_' + item }}"
+        relationship_type: extended_data_protection
+        https: true
+        validate_certs: false
+        use_rest: always
+      with_items:
+        - "{{ src_cg_vols }}"
+      tags:
+        - ontap_snapmirror_break
+
+    - name: Enable NFS and junction path for Destination Volumes
+      netapp.ontap.na_ontap_volume:
+        hostname: "{{ dst_cluster_ip }}"
+        username: "{{ dst_cluster_username }}"
+        password: "{{ dst_cluster_password }}"
+        state: present
+        vserver: "{{ dst_vserver }}"
+        policy: "{{ export_policy_details.name }}"
+        name: "dr_{{ item }}"
+        junction_path: "/dr_{{ item }}"
+        https: true
+        validate_certs: false
+      with_items:
+        - "{{ src_cg_vols }}"

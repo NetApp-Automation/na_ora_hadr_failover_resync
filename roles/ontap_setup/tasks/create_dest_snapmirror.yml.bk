@@ -1,32 +1,26 @@
 ##################################################################
 ##################################################################
 - block:
-    - name: Create Snapmiror Policy
-      na_ontap_snapmirror_policy:
-        hostname: "{{ dst_cluster_ip }}"
-        username: "{{ dst_cluster_username }}"
-        password: "{{ dst_cluster_password }}"
-        state: present
-        vserver: "{{ dst_vserver }}"
-        policy_name: "{{ snapmirror_policy }}"
-        policy_type: "async_mirror"
-        comment: "Created by Ansible"
-        https: true
-        validate_certs: false
-      tags:
-        - ontap_snapmirror_policy 
+#    - name: Create Snapmiror Policy
+#      na_ontap_snapmirror_policy:
+#        hostname: "{{ dst_cluster_ip }}"
+#        username: "{{ dst_cluster_username }}"
+#        password: "{{ dst_cluster_password }}"
+#        state: present
+#        vserver: "{{ dst_vserver }}"
+#        policy_name: "{{ snapmirror_policy }}"
+#        policy_type: async_mirror
+#        comment: "Created by Ansible"
+#        https: true
+#        validate_certs: false
+#      tags:
+#        - ontap_snapmirror_policy 
 
-    - name: Disable default snapshot policy at primary
-      na_ontap_ssh_command:
-        username: "{{ src_cluster_username }}"
-        password: "{{ src_cluster_password }}"
-        hostname: "{{ src_cluster_ip }}"
-        command: snapshot policy modify -policy "{{ item }}" -enabled false
-        privilege: admin
-      with_items:
-        - "{{ default_snapshot_policy }}"
-      tags:
-        - ontap_disable_default_snapshot_p
+#    - name: Obtain Oracle Consistency Group Volumes
+#      set_fact:
+#        src_cg_vols: "{{ src_orabinary_vols.vol_name + src_db_vols.vol_name + src_archivelog_vols.vol_name }}"
+#    - debug:
+#        msg: "Source Consistency Group Volumes {{ src_cg_vols }}"
 
     - name: Set password for vsadmin user at primary FSx
       na_ontap_user:
@@ -98,45 +92,23 @@
       tags:
         - ontap_unlock_svm_admin_s
 
-    - name: Create target Oracle volumes for SnapMirror
-      na_ontap_volume:
-        hostname: "{{ dst_vserver_mgmt_lif }}"
-        username: "{{ dst_snapadmin_username }}"
-        password: "{{ dst_snapadmin_password}}"
-        state: present
-        vserver: "{{ dst_vserver }}"
-        policy: default
-        name: "{{ 'dr_' + item.vol_name }}"
-        size: "{{ item.size }}"
-        type: DP
-        aggregate_name: "{{ item.aggr_name }}"
-        space_guarantee: none
-        percent_snapshot_space: 0
-        https: true
-        validate_certs: false
-        encrypt: no
-        use_rest: auto
-      with_items:
-        - "{{ src_orabinary_vols }}"
-        - "{{ src_db_vols }}"
-        - "{{ src_archivelog_vols }}"
-      tags:
-        - ontap_create_target_vols
-
     - name: Create ONTAP/ONTAP SnapMirror
-      netapp.ontap.na_ontap_snapmirror:
-        state: present
-        source_endpoint:
-          cluster: "{{ src_cluster_name }}"
-          path: "{{ src_vserver}}:{{ item.vol_name }}"
-        destination_endpoint:
-          cluster: "{{ dst_cluster_name }}"
-          path: "{{ dst_vserver }}:dr_{{ item.vol_name }}"
-        policy: "{{ snapmirror_policy }}"
-        initialize: true
+      na_ontap_snapmirror:
         hostname: "{{ dst_vserver_mgmt_lif }}"
         username: "{{ dst_snapadmin_username }}"
         password: "{{ dst_snapadmin_password }}"
+        state: present
+        source_endpoint:
+#          cluster: "{{ src_cluster_name }}"
+          path: "{{ src_vserver + ':' + item.vol_name }}"
+        destination_endpoint:
+#          cluster: "{{ dst_cluster_name }}"
+          path: "{{ dst_vserver + ':' + 'hr_' + item.vol_name }}"
+        initialize: true
+        create_destination:
+          enabled: true
+#        policy: "{{ snapmirror_policy }}"
+        relationship_type: extended_data_protection
         https: true
         validate_certs: false
         use_rest: always
@@ -145,23 +117,21 @@
         - "{{ src_orabinary_vols }}"
         - "{{ src_db_vols }}"
         - "{{ src_archivelog_vols }}"
+      async: 600
+      poll: 0
       tags:
         - ontap_snapmirror_create
 
-    - name: Print all available facts
-      ansible.builtin.debug:
-        var: snapmirror_create
-
-#    - name: Wait for Snapmirrors to complete
-#      async_status:
-#        jid: "{{ item.ansible_job_id }}"
-#      register: snapmirror_jobs
-#      until: snapmirror_jobs.finished
-#      delay: 5  
-#      retries: 100
-#      with_items: "{{ snapmirror_create.results }}"
-#      tags:
-#        - ontap_snapmirror_create
+    - name: Wait for Snapmirrors to complete
+      async_status:
+        jid: "{{ item.ansible_job_id }}"
+      register: snapmirror_jobs
+      until: snapmirror_jobs.finished
+      delay: 5  
+      retries: 100
+      with_items: "{{ snapmirror_create.results }}"
+      tags:
+        - ontap_snapmirror_create
 
   tags:
     - ontap_snapmirror  

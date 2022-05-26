@@ -1,0 +1,8 @@
+---
+# ----------------------------------------------------------------------------------------------------------------------
+- block:
+    - name: Oracle Restore Tasks
+      include_tasks: ora_resync.yml
+      tags:
+        - ontap_ora_resync
+

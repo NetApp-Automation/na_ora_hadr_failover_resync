@@ -1,0 +1,25 @@
+ansible_host: 172.30.15.96
+
+# Oracle db log mode: true or false
+log_archive_mode: true
+
+# Number of pluggable database per container instance identified by sid
+oracle_sid: CDB1
+pdb_num: 1
+pdb_name: "{{ oracle_sid }}_pdb"
+
+# CDB listener port, use different listener port for additional CDB on same host
+listener_port: 1521
+
+# CDB is created with SGA at 75% of memory_limit, MB. Consider how many databases to be hosted on the node and how much ram to be allocated to each DB. The grand total SGA should not exceed 75% available RAM on node.
+memory_limit: 11469
+
+# Set "em_configuration: DBEXPRESS" to install enterprise manager express and choose a unique port from 5500 to 5599 for each sid on the host.
+# Leave them black if em express is not installed.
+em_configuration:
+em_express_port:
+
+host_datastores_nfs:
+  - {vol_name: "{{groups.oracle[0]}}_bin", aggr_name: aggr1, lif: 172.30.14.6, size: 20}
+  - {vol_name: "{{groups.oracle[0]}}_data", aggr_name: aggr1, lif: 172.30.14.6, size: 20}
+  - {vol_name: "{{groups.oracle[0]}}_log", aggr_name: aggr1, lif: 172.30.14.6, size: 20}
