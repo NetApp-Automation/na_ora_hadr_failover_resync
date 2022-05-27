@@ -6,7 +6,14 @@ default_snapshot_policy:
   - default-1weekly
 
 #Please Enter Source Volume Name to be protected
-src_cg_vols: []
+src_cg_dat_vols: []
+src_cg_log_vols: []
+
+#Please Enter Destination Snapmirror Policy
+snapmirror_policy: async_policy_oracle
+
+#Please Enter Source Snapshot Prefix Name
+cg_snapshot_name_prefix: oracle
 
 #Credentials
 src_cluster_username: fsxadmin

@@ -8,20 +8,6 @@
 ### Ontap env specific config variables ###
 ###########################################
 
-#Names of the Nodes in the Source ONTAP Cluster
-#src_nodes:
-#  - FsxId011c856f6aac64d79-01 
-#  - FsxId011c856f6aac64d79-02 
-
-#Names of the Nodes in the Destination CVO Cluster
-#dst_nodes:
-#  - FsxId03342a82ed2c9d827-01
-#  - FsxId03342a82ed2c9d827-02
-
-#Define whether or not to create intercluster lifs on source cluster (ONLY CHANGE to 'No' IF YOU HAVE ALREADY CREATED THE INTERCLUSTER LIFS)
-#create_source_intercluster_lifs: no
-#create_destination_intercluster_lifs: no
-
 ####################################################################################################
 # Variables for SnapMirror Peering
 ####################################################################################################
@@ -59,8 +45,6 @@ src_vserver_mgmt_lif: 172.30.14.6
 #####################################################################################################
 # Variable for Oracle Volumes and SnapMirror Details
 #####################################################################################################
-#Please Enter Source Snapshot Prefix Name
-cg_snapshot_name_prefix: oracle
 
 #Please Enter Source Oracle Binary Volume(s)
 src_orabinary_vols:
@@ -74,19 +58,6 @@ src_db_vols:
 src_archivelog_vols:
   - {vol_name: "{{groups.oracle[0]}}_log", aggr_name: aggr1, lif: 172.30.14.6, size: 20}
 
-#Please Enter Destination Snapmirror Policy
-snapmirror_policy: async_policy_oracle
-
-#####################################################################################################
-# Export Policy Details
-#####################################################################################################
-#Enter the destination export policy details (Once CVO is Created Add this Variable to all templates)
-#export_policy_details:
-#  name: default
-#  client_match: 0.0.0.0/0
-#  ro_rule: sys
-#  rw_rule: sys
-
 #####################################################################################################
 ### Linux env specific config variables ###
 #####################################################################################################
@@ -96,10 +67,6 @@ mount_points:
   - /u01
   - /u02
   - /u03
-
-# Up to 75% of node memory size divided by 2mb. Consider how many databases to be hosted on the node and how much ram to be allocated to each DB.
-# Leave it blank if hugepage is not configured on the host.
-hugepages_nr:
 
 # RedHat subscription username and password
 redhat_sub_username: xxx
@@ -111,8 +78,3 @@ redhat_sub_password: xxx
 #Recovery Type and point (default as scn and recovery_point black)
 recovery_type: scn
 recovery_point: ""
-
-#Oracle Control Files
-control_files:
-  - "/u02/oradata/{{instance_sid}}/control01.ctl"
-  - "/u03/orareco/{{instance_sid}}/control02.ctl"

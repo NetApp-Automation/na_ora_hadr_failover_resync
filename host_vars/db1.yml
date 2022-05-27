@@ -14,6 +14,10 @@ listener_port: 1521
 # CDB is created with SGA at 75% of memory_limit, MB. Consider how many databases to be hosted on the node and how much ram to be allocated to each DB. The grand total SGA should not exceed 75% available RAM on node.
 memory_limit: 11469
 
+# Up to 75% of node memory size divided by 2mb. Consider how many databases to be hosted on the node and how much ram to be allocated to each DB.
+# Leave it blank if hugepage is not configured on the host.
+hugepages_nr:
+
 # Set "em_configuration: DBEXPRESS" to install enterprise manager express and choose a unique port from 5500 to 5599 for each sid on the host.
 # Leave them black if em express is not installed.
 em_configuration:
@@ -23,3 +27,9 @@ host_datastores_nfs:
   - {vol_name: "{{groups.oracle[0]}}_bin", aggr_name: aggr1, lif: 172.30.14.6, size: 20}
   - {vol_name: "{{groups.oracle[0]}}_data", aggr_name: aggr1, lif: 172.30.14.6, size: 20}
   - {vol_name: "{{groups.oracle[0]}}_log", aggr_name: aggr1, lif: 172.30.14.6, size: 20}
+
+#Oracle Control Files
+control_files:
+  - "/u02/oradata/{{ oracle_sid }}/control01.ctl"
+  - "/u03/orareco/{{ oracle_sid }}/control02.ctl"
+

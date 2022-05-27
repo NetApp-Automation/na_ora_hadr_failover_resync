@@ -2,7 +2,7 @@
 # ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
 - block:
-    - name: Put Oracle DBs in backup mode on target DB servers before snapshots
+    - name: Switch Oracle active log before snapshots
       include_tasks: ora_switch_log.yml
       tags: 
         - ora_switch_log

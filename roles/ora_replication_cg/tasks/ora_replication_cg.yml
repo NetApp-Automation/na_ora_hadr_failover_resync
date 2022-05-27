@@ -1,24 +1,12 @@
 - block:
-    - name: Obtain Oracle Consistency Group Volumes
+    - name: Obtain Oracle Consistency Group data volumes
       set_fact:
-        src_cg_vols: "{{ src_db_vols }}"
+        src_cg_dat_vols: "{{ src_cg_dat_vols + [item.vol_name] }}"
+      with_items:
+        - "{{ src_orabinary_vols }}"
+        - "{{ src_db_vols }}"
     - debug:
-        msg: "Source Consistency Group Volumes {{ src_cg_vols }}"
-
-#    - name: ONTAP Info
-#      netapp.ontap.na_ontap_rest_info:
-#        hostname: "{{ src_cluster_ip }}"
-#        username: "{{ src_cluster_username }}"
-#        password: "{{ src_cluster_password }}"
-#        http_port: null
-#        https: true
-#        validate_certs: false
-#        gather_subset: 
-#        - clock_info
-#        use_rest: always
-#      register: ontap_time
-#      tags:
-#        - ontap_time
+        msg: "Source Consistency Group Volumes {{ src_cg_dat_vols }}"
 
     - name: Get Timestamp
       uri:
@@ -32,15 +20,6 @@
     - set_fact:
         readable_format: "{{ ontap_time.json.statistics.timestamp }}"
          
-#    - set_fact:
-#        temp: "{{ ontap_time.json.statistics.timestamp }}"
-
-#    - set_fact:
-#        temp: "{{ ontap_time.ontap_info.clock_info.local_time }}"
-
-#    - set_fact:
-#        readable_format: "{{ '%Y-%m-%d:%H:%M:00' | strftime(temp) }}"
-
     - name: Consistency Group Snapshot
       netapp.ontap.na_ontap_cg_snapshot:
         hostname: "{{ src_cluster_ip }}"
@@ -52,7 +31,7 @@
         use_rest: always
         vserver: "{{ src_vserver }}"
         snapshot: "{{ cg_snapshot_name_prefix + '.' + readable_format }}"
-        volumes: "{{ src_cg_vols }}"
+        volumes: "{{ src_cg_dat_vols }}"
         snapmirror_label: "{{ cg_snapshot_name_prefix }}"
       tags:
         - ontap_cg_snapshot
@@ -66,7 +45,7 @@
         accept_unknown_host_keys: true
         privilege: admin
       with_items:
-        - "{{ src_cg_vols }}"
+        - "{{ src_cg_dat_vols }}"
       tags:
         - ontap_snapmirror_update
 
