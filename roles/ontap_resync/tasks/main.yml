@@ -1,8 +1,8 @@
 ---
 # ----------------------------------------------------------------------------------------------------------------------
 - block:
-    - name: Oracle Restore Tasks
-      include_tasks: ora_resync.yml
+    - name: Resync ONTAP Oracle database volumes after a failover
+      include_tasks: ontap_ora_resync.yml
       tags:
         - ontap_ora_resync
 

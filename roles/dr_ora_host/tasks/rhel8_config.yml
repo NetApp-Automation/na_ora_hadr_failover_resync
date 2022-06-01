@@ -1,15 +1,15 @@
 ---
 - block:
 # Register RedHat subscription linked to a user account
-    - name: Register subscriptions for RedHat Server
-      community.general.redhat_subscription:
-        state: present
-        username: '{{ redhat_sub_username }}'
-        password: '{{ redhat_sub_password }}'
-        auto_attach: true
-      become: true
-      tags:
-        - register_subscription_el8
+#    - name: Register subscriptions for RedHat Server
+#      community.general.redhat_subscription:
+#        state: present
+#        username: '{{ redhat_sub_username }}'
+#        password: '{{ redhat_sub_password }}'
+#        auto_attach: true
+#      become: true
+#      tags:
+#        - register_subscription_el8
 
     - name: Copy Oracle 19c preinstall rpm file to Oracle inventory host
       ansible.builtin.copy:

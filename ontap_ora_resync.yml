@@ -1,0 +1,28 @@
+#This Playbook is designed to be ran on-demand when ontap DB vols resync is needed
+
+- name: Shutdown and unmount Oracle on target/DR host
+  hosts: dr_oracle
+  gather_facts: False
+  vars_files:
+    - roles/dr_ora_host/defaults/main.yml
+  tasks:
+    - name: Call Oracle decommission tasks
+      include_role:
+        name: dr_ora_host
+        tasks_from: ora_decomm.yml
+  tags:
+    - ora_decomm
+    
+- name: ONTAP Oracle vols resync
+  collections:
+    - netapp.ontap
+  hosts: localhost
+  connection: local
+  gather_facts: False
+  vars_files:
+    - roles/ora_restore/defaults/main.yml
+    - roles/ontap_setup/defaults/main.yml
+  roles:
+    - role: ontap_resync
+  tags:
+    - ontap_ora_resync

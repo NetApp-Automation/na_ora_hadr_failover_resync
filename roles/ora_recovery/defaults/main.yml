@@ -1,5 +1,5 @@
 ---
 # Default oracle parameters
-oracle_user: rdsdb
-oracle_install_group: rdsdb
+oracle_user: oracle
+oracle_install_group: oinstall
 script_dir: /tmp

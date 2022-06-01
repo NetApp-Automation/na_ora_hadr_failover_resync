@@ -1,11 +1,15 @@
 ---
 # NFS Specific Mount Points
 - block:
-    - name: Obtain Oracle Consistency Group Volumes
+    - name: Obtain Oracle Consistency Group all Volumes
       set_fact:
-        src_vols: "{{ src_db_vols + src_archivelog_vols }}"
+        src_cg_all_vols: "{{ src_cg_all_vols + [item.vol_name] }}"
+      with_items:
+        - "{{ src_orabinary_vols }}"
+        - "{{ src_db_vols }}"
+        - "{{ src_archivelog_vols }}"
     - debug:
-        msg: "Source Consistency Group Volumes {{ src_vols }}"
+        msg: "Source Consistency Group Volumes {{ src_cg_all_vols }}"
    
     - name: Create mount points for NFS file systems
       file:
@@ -28,6 +32,6 @@
       become: true
       with_together:
           - '{{ mount_points }}'
-          - '{{ src_vols }}'
+          - '{{ src_cg_all_vols }}'
       tags:
         - mount_host_datastores

@@ -14,23 +14,23 @@
       tags:
         - sync_control_file
 
-#    - name: Copy relink script to target Oracle DB servers
-#      ansible.builtin.copy:
-#        src: ora_relink.sh
-#        dest: '{{ script_dir }}'
-#        owner: '{{ oracle_user }}'
-#        group: '{{ oracle_install_group }}'
-#        mode: 0755
-#      become: true
-#      tags:
-#        - cp_relink_script
+    - name: Copy relink script to target Oracle DB servers
+      ansible.builtin.copy:
+        src: ora_relink.sh
+        dest: '{{ script_dir }}'
+        owner: '{{ oracle_user }}'
+        group: '{{ oracle_install_group }}'
+        mode: 0755
+      become: true
+      tags:
+        - cp_relink_script
 
-#    - name: Relink Oracle binary before DB recovery
-#      shell: "{{ script_dir }}/ora_relink.sh }}"
-#      become: true
-#      become_user: '{{ oracle_user }}'
-#      tags:
-#        - exe_relink_script
+    - name: Relink Oracle binary before DB recovery
+      shell: "{{ script_dir }}/ora_relink.sh }}"
+      become: true
+      become_user: '{{ oracle_user }}'
+      tags:
+        - exe_relink_script
 
     - name: Copy recovery script to target Oracle DB servers
       ansible.builtin.copy:

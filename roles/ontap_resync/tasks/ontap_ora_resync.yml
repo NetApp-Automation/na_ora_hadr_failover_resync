@@ -1,5 +1,5 @@
 - block:
-    - name: Obtain Oracle Consistency Group Volumes
+    - name: Obtain Oracle Consistency Group all Volumes
       set_fact:
         src_cg_all_vols: "{{ src_cg_all_vols + [item.vol_name] }}"
       with_items:
@@ -9,13 +9,13 @@
     - debug:
         msg: "Source Consistency Group all Volumes {{ src_cg_all_vols }}"
 
-    - name: Break ONTAP/ONTAP SnapMirror
+    - name: Resync ONTAP/ONTAP SnapMirror
       netapp.ontap.na_ontap_snapmirror:
         hostname: "{{ dst_vserver_mgmt_lif }}"
         username: "{{ dst_snapadmin_username }}"
         password: "{{ dst_snapadmin_password }}"
         state: present
-        relationship_state: broken
+        relationship_state: active
         source_endpoint:
           cluster: "{{ src_cluster_name }}"
           path: "{{ src_vserver + ':' + item }}"
@@ -29,19 +29,4 @@
       with_items:
         - "{{ src_cg_all_vols }}"
       tags:
-        - ontap_snapmirror_break
-
-    - name: Enable NFS and junction path for Destination Volumes
-      netapp.ontap.na_ontap_volume:
-        hostname: "{{ dst_vserver_mgmt_lif }}"
-        username: "{{ dst_snapadmin_username }}"
-        password: "{{ dst_snapadmin_password }}"
-        state: present
-        vserver: "{{ dst_vserver }}"
-        policy: "{{ nfs_export_policy }}"
-        name: "dr_{{ item }}"
-        junction_path: "/dr_{{ item }}"
-        https: true
-        validate_certs: false
-      with_items:
-        - "{{ src_cg_all_vols }}"
+        - ontap_snapmirror_active

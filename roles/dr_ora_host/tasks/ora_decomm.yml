@@ -1,0 +1,33 @@
+---
+- block:
+    - name: Copy db_shut script to target Oracle DB servers
+      ansible.builtin.template:
+        src: "ora_shut.tpl"
+        dest: "{{ script_dir }}/ora_shut.sh"
+        owner: '{{ oracle_user }}'
+        group: '{{ oracle_install_group }}'
+        mode: 0755
+      become: true
+      tags:
+        - cp_dbshut_script
+
+    - name: Shutdown Oracle database on target or DR database host
+      shell: "{{ script_dir }}/ora_shut.sh"
+      become: true
+      become_user: '{{ oracle_user }}'
+      tags:
+        - exe_dbshut_script
+
+    - name: Unmount Oracle file systems
+      mount:
+        path: '{{ item.0 }}'
+        src: "{{ item.1.lif }}:/{{ item.1.vol_name }}"
+        fstype: nfs
+        opts: "rw,bg,hard,nointr,rsize=32768,wsize=32768,tcp,vers=3,timeo=600"
+        state: unmounted
+      become: true
+      with_together:
+          - '{{ mount_points }}'
+          - '{{ host_datastores_nfs }}'
+      tags:
+        - unmount_host_datastores

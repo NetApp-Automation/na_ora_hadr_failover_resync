@@ -8,6 +8,7 @@ default_snapshot_policy:
 #Please Enter Source Volume Name to be protected
 src_cg_dat_vols: []
 src_cg_log_vols: []
+src_cg_all_vols: []
 
 #Please Enter Destination Snapmirror Policy
 snapmirror_policy: async_policy_oracle

@@ -13,6 +13,6 @@
       when: '"{{ item.0 }} from {{ dst_nfs_lif }}:/dr_{{ item.1 }}" not in result.stdout'
       with_together:
         - "{{ mount_points }}"
-        - "{{ src_vols }}"
+        - "{{ src_cg_all_vols }}"
       tags:
         - verify_nfs_mounts
