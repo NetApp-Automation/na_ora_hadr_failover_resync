@@ -152,17 +152,6 @@
       ansible.builtin.debug:
         var: snapmirror_create
 
-#    - name: Wait for Snapmirrors to complete
-#      async_status:
-#        jid: "{{ item.ansible_job_id }}"
-#      register: snapmirror_jobs
-#      until: snapmirror_jobs.finished
-#      delay: 5  
-#      retries: 100
-#      with_items: "{{ snapmirror_create.results }}"
-#      tags:
-#        - ontap_snapmirror_create
-
   tags:
     - ontap_snapmirror  
   rescue:

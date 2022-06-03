@@ -1,0 +1,42 @@
+---
+#Add swap space to AWS ec2 instance when ec2_instance=yes
+- block:
+    - name: Create swap file
+      command: dd if=/dev/zero of=/swapfile bs=128M count={{ swap_blocks }}
+      when: ansible_swaptotal_mb < 1
+      become: true
+      tags:
+        - cre_swap_file
+
+    - name: Change swapfile permission
+      command: chmod 600 /swapfile
+      when: ansible_swaptotal_mb < 1
+      become: true
+      tags:
+        - chmod_swap_file
+
+    - name: Set up a Linux swap area
+      command: mkswap /swapfile
+      when: ansible_swaptotal_mb < 1
+      become: true
+      tags:
+        - mkswap_swap_file
+
+    - name: Make the swap file available
+      command: swapon /swapfile
+      when: ansible_swaptotal_mb < 1
+      become: true
+      tags:
+        - swapon_swap_file
+
+    - name: Start the swap file at boot
+      lineinfile:
+        path: /etc/fstab
+        line: /swapfile swap swap defaults 0 0
+        create: yes
+      become: true
+      when: ansible_swaptotal_mb < 1
+      tags:
+        - upd_fstab
+  tags:
+    - add_swap_ec2

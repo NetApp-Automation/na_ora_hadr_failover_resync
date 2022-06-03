@@ -1,14 +1,7 @@
-#This Playbook is designed to be ran on-demand when DB recovery is needed
-- name: Oracle Linux Setup and Storage Config for Oracle
-  hosts: dr_oracle
-  gather_facts: True
-  vars_files:
-    - roles/dr_ora_host/defaults/main.yml
-  roles:
-    - role: dr_ora_host
-  tags:
-    - linux_config
-
+# This Playbook is designed to be ran on-demand when DB recovery is needed
+# Execute ora_dr_setup.yml playbook to setup the dr host before running this playbook
+# Ensure that /etc/oratab, /etc/oraInst.loc files have been copied over from pirmary server to dr server 
+---
 - name: Oracle DB Restore
   collections:
     - netapp.ontap

@@ -15,3 +15,8 @@ oracle_reco: /u03/orareco
 oracle_user: oracle
 oracle_install_group: oinstall
 script_dir: /tmp
+
+# Files to be synced between primary and dr server
+files_to_sync:
+  - /etc/oratab
+  - /etc/oraInst.loc

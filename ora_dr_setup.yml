@@ -1,0 +1,11 @@
+---
+# Setup Oracle DR host before executing Oracle recovery playbook
+- name: Oracle DR host Linux Setup  
+  hosts: dr_oracle
+  gather_facts: True
+  vars_files:
+    - roles/dr_ora_host/defaults/main.yml
+  roles:
+    - role: dr_ora_host
+  tags:
+    - ora_dr_linux_config

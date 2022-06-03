@@ -1,0 +1,24 @@
+---
+# Copy primary server ssh key to standby/dr host to sync file between primary and dr server  
+- block:
+    - name: Copy ssh key from local to standby/dr server
+      ansible.builtin.copy:
+        src: ./{{ groups.oracle[0] }}.pem
+        dest: /home/ec2-user/{{ groups.oracle[0] }}.pem 
+        owner: ec2-user
+        group: ec2-user
+        mode: 0400
+      become: true
+      tags:
+        - cp_ssh_file   
+
+    - name: Copy files from primary to control host
+      shell: scp -i /home/ec2-user/{{ groups.oracle[0] }}.pem -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ec2-user@{{ groups.oracle[0] }}:{{ item }} {{ item }}
+      become: true
+      with_items:
+        - "{{ files_to_sync }}"
+      tags:
+        - cp_sync_files
+  tags:
+    - ora_sync_files
+
