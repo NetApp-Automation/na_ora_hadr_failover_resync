@@ -125,5 +125,5 @@ Playbook Execution - executed in sequence
 Help
 ---------
 
-If you need help with this solution and use cases, please join the link:https://netapppub.slack.com/archives/C021R4WC0LC[NetApp Solution Automation community support Slack channel^] and look for the solution-automation channel to post your questions or inquires.
+If you need help with this solution and use cases, please join the [NetApp Solution Automation community support Slack channel](https://netapppub.slack.com/archives/C021R4WC0LC) and look for the solution-automation channel to post your questions or inquires.
       
