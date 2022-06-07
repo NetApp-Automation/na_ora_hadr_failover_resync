@@ -16,7 +16,7 @@ passphrase: netappopensesame
 #Please Enter Destination Cluster Name
 dst_cluster_name: FsxId03342a82ed2c9d827
 
-#Please Enter Destination Cluster management IP (Once CVO is Created Add this Variable to all templates)
+#Please Enter Destination Cluster management IP (Once FSx is Created Add this Variable to all templates)
 dst_cluster_ip: 172.30.14.19
 
 #Please Enter Destination Cluster inter-cluster IP
@@ -26,7 +26,7 @@ dst_inter_ip: 172.30.14.4
 dst_vserver: ora-svm
 dst_vserver_mgmt_lif: 172.30.14.5
 
-#Please Enter NFS Lif for dst vserver (Once CVO is Created Add this Variable to all templates)
+#Please Enter NFS Lif for dst vserver (Once FSx is Created Add this Variable to all templates)
 dst_nfs_lif: 172.30.14.5
 
 #Please Enter Source Cluster Name
